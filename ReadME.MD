@@ -10,5 +10,5 @@ Description
 Latitude
 Longitude
 Price
-Images
-This tool is a web application
+Images.
+This tool is a web application.
