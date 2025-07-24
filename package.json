@@ -1,0 +1,17 @@
+{
+  "name": "quest-generator",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "keywords": [ "axios, dotenv, readline-sync"],
+  "author": "Bowoto jeremiah",
+  "license": "ISC",
+  "description": "This tool is a continuation of the effort to streamline quest creation, creating an interactive program that takes a location name as input and uses multiple sources/APIs to collect information - and outputs a new quest",
+  "dependencies": {
+    "axios": "^1.11.0",
+    "dotenv": "^17.2.0",
+    "readline-sync": "^1.4.10"
+  }
+}
