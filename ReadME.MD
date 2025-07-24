@@ -11,4 +11,4 @@ Latitude
 Longitude
 Price
 Images.
-This tool is a web application.
+This tool is a CLI application.
