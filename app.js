@@ -4,8 +4,10 @@ const { startQuestCreation } = require("./controllers/quest-controller");
 const main = async () => {
   console.log("Welcome to Quest Creator!");
   const locationName = readlineSync.question("Enter a location name: ");
-  await startQuestCreation(locationName);
+  const success = await startQuestCreation(locationName);
+  if (success){
   console.log("Quest creation complete.");
+  }
 };
 
 main();
