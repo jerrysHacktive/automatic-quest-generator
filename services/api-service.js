@@ -1,5 +1,10 @@
 const axios = require("axios");
 require("dotenv").config();
+const { GoogleGenerativeAI } = require("@google/generative-ai"); // Import the library
+
+// Initialize Gemini Generative AI
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 // Fetch locations from LocationIQ by name
 const fetchLocations = async (locationName) => {
@@ -75,7 +80,7 @@ const fetchLocationDetails = async (lat, lon) => {
   }
 };
 
-// Generate description by fetching Wikipedia extract and using LLM API or fallback
+// Generate description by fetching Wikipedia extract and using Gemini Flash API or fallback
 const generateDescription = async (locationName) => {
   try {
     // Fetch Wikipedia extract for the location
@@ -94,25 +99,16 @@ const generateDescription = async (locationName) => {
       Object.values(pages)[0].extract || "No Wikipedia data available.";
     console.log("Wikipedia Extract:", wikiText);
 
-    // Generate description using LLM API
-    const llmResponse = await axios.post(
-      process.env.LLM_API_URL,
-      {
-        prompt: `Summarize this into a fun, two-sentence description: ${wikiText}`,
-        max_tokens: 100,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.LLM_API_KEY}`,
-        },
-      }
-    );
-    return llmResponse.data.choices[0].text.trim();
+    // Generate description using Gemini Flash API
+    const prompt = `Summarize this into a fun, two-sentence description: ${wikiText}`;
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const generatedText = response.text();
+
+    return generatedText.trim();
   } catch (error) {
     console.error("Generate Description Error:", {
-      status: error.response?.status,
       message: error.message,
-      data: error.response?.data,
     });
     // Fallback to basic description if Wikipedia or LLM fails
     const fallbackName = locationName.split(",")[0].trim() || "this location";
