@@ -9,26 +9,21 @@ const {
 
 const startQuestCreation = async (locationName) => {
   try {
-    // Fetch locations
-    const locationsData = await fetchLocations(locationName);
-    const locations = Array.isArray(locationsData.features)
-      ? locationsData.features
-      : [locationsData];
-
+    const locations = await fetchLocations(locationName);
     if (locations.length === 0) {
       displayError("No locations found.");
-      return;
+      return false;
     }
 
-    // Display and select location
     displayLocations(locations);
-    const selectedLocation = promptLocationSelection(locations);
+    const selectedLocation = await promptLocationSelection(locations);
 
-    // Create and display quest
     const quest = await createQuest(selectedLocation);
     displayQuest(quest);
+    return true;
   } catch (error) {
     displayError(error.message);
+    return false;
   }
 };
 

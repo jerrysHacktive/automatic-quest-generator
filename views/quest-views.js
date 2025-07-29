@@ -2,12 +2,12 @@ const readlineSync = require("readline-sync");
 
 const displayLocations = (locations) => {
   console.log("\nFound Locations:");
-  locations.forEach((loc, index) => {
-    console.log(`${index + 1}. ${loc.name} (${loc.country})`);
+  locations.forEach((loc) => {
+    console.log(`${loc.id}. ${loc.name} (${loc.type})`);
   });
 };
 
-const promptLocationSelection = (locations) => {
+const promptLocationSelection = async (locations) => {
   const choice = readlineSync.questionInt(
     "\nSelect a location (enter number): ",
     {

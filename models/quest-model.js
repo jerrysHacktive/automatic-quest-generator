@@ -5,26 +5,40 @@ const {
 
 const createQuest = async (location) => {
   try {
-    // Fetch detailed location data
-    const details = await fetchLocationDetails(location.xid);
+    // Fetch detailed location data if coordinates are valid
+    let details = {
+      name: location.name,
+      type: location.type,
+      lat: location.lat,
+      lon: location.lon,
+    };
+    if (
+      location.lat &&
+      location.lon &&
+      !isNaN(location.lat) &&
+      !isNaN(location.lon)
+    ) {
+      details = await fetchLocationDetails(location.lat, location.lon);
+    } else {
+      console.warn(
+        "Skipping fetchLocationDetails due to invalid coordinates:",
+        {
+          lat: location.lat,
+          lon: location.lon,
+        }
+      );
+    }
 
     // Initialize quest object
     const quest = {
-      Title: details.name || "Unknown Location",
+      Title: details.name || location.name || "Unknown Location",
       Aura: 400,
-      Category: details.kinds ? details.kinds.split(",")[0] : "General",
-      Description: "No description available.",
-      Latitude: details.point.lat || 0,
-      Longitude: details.point.lon || 0,
+      Category: details.type || location.type || "General",
+      Description: await generateDescription(location.name),
+      Latitude: details.lat || location.lat || 0,
+      Longitude: details.lon || location.lon || 0,
       Price: null,
     };
-
-    // Generate description if Wikipedia extract exists
-    if (details.wikipedia_extracts && details.wikipedia_extracts.text) {
-      quest.Description = await generateDescription(
-        details.wikipedia_extracts.text
-      );
-    }
 
     return quest;
   } catch (error) {
