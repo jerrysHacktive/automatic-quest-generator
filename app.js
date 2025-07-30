@@ -1,7 +1,7 @@
 const readlineSync = require("readline-sync");
 const { startQuestCreation } = require("./controllers/quest-controller");
 
-const main = async () => {
+const questCreator = async () => {
   console.log("Welcome to Quest Creator!");
   const locationName = readlineSync.question(
     "Enter a location name (e.g., Eiffel Tower, Paris): "
@@ -14,4 +14,4 @@ const main = async () => {
   }
 };
 
-main();
+questCreator();
