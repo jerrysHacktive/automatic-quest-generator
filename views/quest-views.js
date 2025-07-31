@@ -24,9 +24,11 @@ const displayQuest = (quest) => {
   console.log(`Aura: ${quest.Aura}`);
   console.log(`Category: ${quest.Category}`);
   console.log(`Description: ${quest.Description}`);
+  console.log(`Tier: ${quest.Tier}`)
   console.log(`Latitude: ${quest.Latitude}`);
   console.log(`Longitude: ${quest.Longitude}`);
-  console.log(`Price: ${quest.Price}`);
+  console.log(`Pricing: ${quest.Pricing}`);
+  console.log(`Prompt: ${quest.Prompt}`);
 };
 
 const displayError = (message) => {

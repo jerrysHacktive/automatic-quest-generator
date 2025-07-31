@@ -4,7 +4,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai"); // Import the l
 
 // Initialize Gemini Generative AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL });
 
 // Fetch locations from LocationIQ by name
 const fetchLocations = async (locationName) => {
@@ -84,35 +84,71 @@ const fetchLocationDetails = async (lat, lon) => {
 const generateDescription = async (locationName) => {
   try {
     // Fetch Wikipedia extract for the location
-    const wikiResponse = await axios.get("https://en.wikipedia.org/w/api.php", {
-      params: {
-        action: "query",
-        prop: "extracts",
-        exintro: true,
-        explaintext: true,
-        titles: locationName.split(",")[0].trim(), // e.g., "Eiffel Tower" from "Eiffel Tower, Paris"
-        format: "json",
-      },
-    });
-    const pages = wikiResponse.data.query.pages;
-    const wikiText =
-      Object.values(pages)[0].extract || "No Wikipedia data available.";
-    console.log("Wikipedia Extract:", wikiText);
+    // const wikiResponse = await axios.get("https://en.wikipedia.org/w/api.php", {
+    //   params: {
+    //     action: "query",
+    //     prop: "extracts",
+    //     exintro: true,
+    //     explaintext: true,
+    //     titles: locationName.split(",")[0].trim(), // e.g., "Eiffel Tower" from "Eiffel Tower, Paris"
+    //     format: "json",
+    //   },
+    // });
+    // const pages = wikiResponse.data.query.pages;
+    // const wikiText =
+    //   Object.values(pages)[0].extract || "No Wikipedia data available.";
+    // console.log("Wikipedia Extract:", wikiText);
 
     // Generate description using Gemini Flash API
-    const prompt = `Summarize this into a fun, two-sentence description: ${wikiText}`;
+    //For DESCRIPTION, summarize this text into a fun, two-sentence description: "${wikiText}"
+    const prompt = `
+You will be generating information for the following place: ${locationName}
+Please fill in the following fields:
+
+_DESCRIPTION_:
+_CATEGORY_:
+_TIER_:
+_PRICING_:
+
+For DESCRIPTION, create a fun, two-sentence description, based on the location and all information you know about it.
+For CATEGORY, choose one of the following strings based on the place: "all", "nature", "food", "nightlife", "art", "historic", "retail".
+For TIER, choose from "tier1", "tier2", "tier3", or "tier4" (most to least important) based on the place.
+For PRICING, choose either "Free" or "$" - "$$$$", based on how expensive it is to gain admission (for a single person) to the place. ("$" is up to $10, and "$$$$" is up to around $60.)
+
+Please only fill in those fields, and do not include anything else in your output.
+    `;
+
+    console.log("Generating data...")
     const result = await model.generateContent(prompt);
     const response = result.response;
     const generatedText = response.text();
+    console.log("Recieved generated text.")
+    console.log(generatedText)
 
-    return generatedText.trim();
+    let parts = generatedText.split(/_DESCRIPTION_:|_CATEGORY_:|_TIER_:|_PRICING_:/)
+    let data = {
+      Description: parts[1].trim(),
+      Category: parts[2].trim(),
+      Tier: parts[3].trim(),
+      Pricing: parts[4].trim()
+    };
+
+    return data;
+
   } catch (error) {
     console.error("Generate Description Error:", {
       message: error.message,
     });
     // Fallback to basic description if Wikipedia or LLM fails
     const fallbackName = locationName.split(",")[0].trim() || "this location";
-    return `Explore ${fallbackName}, a fascinating landmark! Discover its history and capture its beauty for an unforgettable quest.`;
+    let data = {
+      Description: `Explore ${fallbackName}, a fascinating landmark! Discover its history and capture its beauty for an unforgettable quest.`,
+      Category: "all",
+      Tier: "tier2",
+      Pricing: null
+    };
+
+    return data;
   }
 };
 

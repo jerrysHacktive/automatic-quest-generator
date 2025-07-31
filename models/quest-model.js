@@ -3,7 +3,7 @@ const {
   generateDescription,
 } = require("../services/api-service");
 
-const createQuest = async (location) => {
+const createQuest = async (locationName, location) => {
   try {
     // Fetch detailed location data if coordinates are valid
     let details = {
@@ -29,15 +29,19 @@ const createQuest = async (location) => {
       );
     }
 
+    let info = await generateDescription(location.name);
+
     // Initialize quest object
     const quest = {
       Title: details.name || location.name || "Unknown Location",
       Aura: 400,
-      Category: details.type || location.type || "General",
-      Description: await generateDescription(location.name),
+      Category: info.Category,
+      Description: info.Description,
+      Tier: info.Tier,
       Latitude: details.lat || location.lat || 0,
       Longitude: details.lon || location.lon || 0,
-      Price: null,
+      Pricing: info.Pricing,
+      Prompt: locationName
     };
 
     return quest;

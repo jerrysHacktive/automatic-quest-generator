@@ -1,0 +1,1 @@
+Data is saved into the "saved.csv" file. To initialize this file, just copy the rows in example.csv into a new file.
